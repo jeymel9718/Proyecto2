@@ -1,0 +1,125 @@
+version: "3.7"
+services:
+  catalog:
+    image: jeymel97/catalog-service
+    deploy:
+      restart_policy:
+        condition: on-failure
+      labels:
+        - "traefik.port=5000"
+        - "traefik.backend=catalog"
+        - "traefik.frontend.rule=Path:/graphql"
+    depends_on:
+      - rs1
+      - rs2
+      - rs3
+    networks:
+      - webapi
+  books:
+    image: mlabouardy/books-api
+    networks:
+      - webapi
+    deploy:
+      replicas: 2
+      labels:
+        - "traefik.port=5000"
+        - "traefik.backend=books"
+        - "traefik.frontend.rule=Path:/books,/health"
+  orders:
+    image: denporras/soa-orders-service
+    deploy:
+      replicas: 2
+      restart_policy:
+        condition: on-failure
+      labels:
+        - "traefik.port=5000"
+        - "traefik.backend=orders"
+        - "traefik.frontend.rule=Path:/orders,/ordersiql"
+    networks:
+      - webapi
+  gateway:
+    image: traefik:1.4
+    deploy:
+      placement:
+        constraints:
+          - node.role == manager
+    configs:
+      - source: traefik-config
+        target: /etc/traefik/traefik.toml
+    ports:
+      - "80:80"
+      - "8080:8080"
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock"
+    networks:
+      - webapi
+  visualizer:
+    image: dockersamples/visualizer:stable
+    ports:
+      - "8000:8080"
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock"
+    deploy:
+      placement:
+        constraints: [node.role == manager]
+  jenkins:
+    image: h1kkan/jenkins-docker:lts
+    deploy:
+      placement:
+        constraints:
+          - node.role == manager
+    ports:
+      - "3000:8080"
+      - "50000:50000"
+    volumes:
+      - /vagrant/home/jenkins_home:/var/jenkins_home
+#mongo cluster
+  rs1:
+    image: mongo:3.4
+    command: mongod --replSet "rs0"
+    networks:
+      - webapi
+    ports:
+      - "7001:27017"
+    deploy:
+      placement:
+        constraints: [node.role == manager]
+  rs2:
+    image: mongo:3.4
+    command: mongod --replSet "rs0"
+    networks:
+      - webapi
+    ports:
+      - "7002:27017"
+    deploy:
+      placement:
+        constraints: [node.role == worker]
+  rs3:
+    image: mongo:3.4
+    command: mongod --replSet "rs0"
+    networks:
+      - webapi
+    ports:
+      - "7003:27017"
+    deploy:
+      placement:
+        constraints: [node.role == worker]
+  rs:
+    image: ericsmalling/mongors:3.4
+    build:
+      context: ./apps/mongors 
+    networks:
+      - webapi
+    deploy:
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 10
+
+networks:
+  webapi:
+    driver: overlay
+
+configs:
+  traefik-config:
+    file: config.toml

@@ -1,0 +1,23 @@
+Manifest-Version: 1.0
+Archiver-Version: Plexus Archiver
+Created-By: Apache Maven
+Built-By: andresrc
+Build-Jdk: 1.8.0_192
+Extension-Name: aws-credentials
+Specification-Title: The Jenkins Plugins Parent POM Project
+Implementation-Title: aws-credentials
+Implementation-Version: 1.26
+Group-Id: org.jenkins-ci.plugins
+Short-Name: aws-credentials
+Long-Name: CloudBees AWS Credentials Plugin
+Url: https://wiki.jenkins.io/display/JENKINS/CloudBees+AWS+Credentials
+ +Plugin
+Minimum-Java-Version: 1.8
+Plugin-Version: 1.26
+Hudson-Version: 2.73.3
+Jenkins-Version: 2.73.3
+Plugin-Dependencies: aws-java-sdk:1.11.341,credentials-binding:1.16,cr
+ edentials:2.1.18,jackson2-api:2.8.11.3,script-security:1.53,structs:1
+ .17,pipeline-model-extensions:1.3.1
+Plugin-Developers: 
+
