@@ -1,13 +1,13 @@
 FROM python:3
 
-ENV FLASK_APP app.py
+WORKDIR /app
 
-RUN pip install Flask
+COPY . /app
 
-ADD app /home/app/
+RUN pip install --trusted-host pypi.python.org -r requirements.txt
 
-WORKDIR /home/app
+EXPOSE 5000
 
-EXPOSE 8000
+ENV NAME Catalog
 
-CMD python -m flask run --port=8000 --host=0.0.0.0
+CMD ["python","app.py"]
