@@ -1,19 +1,9 @@
+defaultEntryPoints = ["http"]
 logLevel="DEBUG"
 debug=true
 
 [web]
 address=":8080"
-
-[entryPoints]
-    [entryPoints.http.auth]
-      headerField = "X-WebAuth-User"
-      [entryPoints.http.auth.basic]
-        removeHeader = true
-        users = [
-          "test:$apr1$H6uskkkW$IgXLP6ewTrSuBkTrqE8wj/",
-          "test2:$apr1$d9hr9HBB$4HxwgUir3HP4EsggP/QNo0",
-        ]
-        usersFile = "/path/to/.htpasswd"
 
 [docker]
 endpoint="unix://var/run/docker.sock"

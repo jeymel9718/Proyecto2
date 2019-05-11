@@ -3,6 +3,7 @@ services:
   catalog:
     image: jeymel97/catalog-service
     deploy:
+      replicas: 3
       restart_policy:
         condition: on-failure
       labels:
@@ -15,20 +16,20 @@ services:
       - rs3
     networks:
       - webapi
-  books:
-    image: mlabouardy/books-api
+  users:
+    image: nabetse28/soa-proyecto2
     networks:
       - webapi
     deploy:
-      replicas: 2
+      replicas: 3
       labels:
         - "traefik.port=5000"
-        - "traefik.backend=books"
-        - "traefik.frontend.rule=Path:/books,/health"
+        - "traefik.backend=users"
+        - "traefik.frontend.rule=Path:/usuarios"
   orders:
     image: denporras/soa-orders-service
     deploy:
-      replicas: 2
+      replicas: 3
       restart_policy:
         condition: on-failure
       labels:
@@ -43,6 +44,9 @@ services:
       placement:
         constraints:
           - node.role == manager
+      labels:
+        - "traefik.http.middlewares.my-auth.basicauth.users=test:$$apr1$$H6uskkkW$$IgXLP6ewTrSuBkTrqE8wj/,test2:$$apr1$$d9hr9HBB$$4HxwgUir3HP4EsggP/QNo0"
+        - "traefik.http.middlewares.my-auth.basicauth.headerField=X-WebAuth-User"
     configs:
       - source: traefik-config
         target: /etc/traefik/traefik.toml
